@@ -8,6 +8,7 @@ using System.Linq;
 using System.ServiceProcess;
 using System.Text;
 using System.Threading.Tasks;
+using BackendiService.Backendi_Service_Core;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
@@ -15,6 +16,9 @@ namespace BackendiService
 {
     public partial class BackendiService : ServiceBase
     {
+
+        ServiceCore ServiceCore = new ServiceCore();
+
 
         public BackendiService()
         {
@@ -27,13 +31,14 @@ namespace BackendiService
 
         protected override void OnStart(string[] args)
         {
-
+            //start service
+            ServiceCore.Run();
 
         }
 
         protected override void OnStop()
         {
-
+            ServiceCore.OnError();
         }
 
         protected override void OnContinue()
