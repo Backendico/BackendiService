@@ -16,7 +16,6 @@ namespace BackendiService.Backendi_Service_Core
 
         Leaderboard_TimeReset Leaderboard_TimeReset = new Leaderboard_TimeReset();
 
-        List<TaskJob> JobsLeaderboard = new List<TaskJob>();
 
         internal async void Run()
         {
@@ -25,6 +24,11 @@ namespace BackendiService.Backendi_Service_Core
                 await Task.Delay(1);
 
                 var LeaderboardTask = await Leaderboard_TimeReset.ReciveTasks();
+
+                foreach (var item in LeaderboardTask)
+                {
+                    item();
+                }
 
             }
         }
