@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using RestSharp;
 
 namespace BackendiService.Backendi_Service_Core.Leaderboard.TimeReset
 {
@@ -32,12 +33,12 @@ namespace BackendiService.Backendi_Service_Core.Leaderboard.TimeReset
                         {
                             case 1:
                                 {
-                                    if (LeaderboardSetting.Value["Start"].ToLocalTime().AddHours(LeaderboardSetting.Value["Amount"].ToInt32()) <= DateTime.Now)
+                                    if (LeaderboardSetting.Value["Start"].ToLocalTime().AddMinutes(LeaderboardSetting.Value["Amount"].ToInt32()) <= DateTime.Now)
                                     {
-                                        Tasks.Add(async () =>
-                                        {
-                                            await Client.GetDatabase("").GetCollection<BsonDocument>("").FindAsync("");
-                                        });
+                                        Tasks.Add(() =>
+                                       {
+                                           ResetLeaderboard(InfoUser["AccountSetting"]["Token"].ToString(), InfoUser["Games"][i].AsString, LeaderboardSetting.Name);
+                                       });
                                     }
                                 }
                                 break;
@@ -45,9 +46,9 @@ namespace BackendiService.Backendi_Service_Core.Leaderboard.TimeReset
                                 {
                                     if (LeaderboardSetting.Value["Start"].ToLocalTime().AddDays(LeaderboardSetting.Value["Amount"].ToInt32()) <= DateTime.Now)
                                     {
-                                        Tasks.Add(async () =>
+                                        Tasks.Add( () =>
                                         {
-                                            await Client.GetDatabase("").GetCollection<BsonDocument>("").FindAsync("");
+                                            ResetLeaderboard(InfoUser["AccountSetting"]["Token"].ToString(), InfoUser["Games"][i].AsString, LeaderboardSetting.Name);
                                         });
                                     }
                                 }
@@ -57,34 +58,47 @@ namespace BackendiService.Backendi_Service_Core.Leaderboard.TimeReset
                                     var Week = LeaderboardSetting.Value["Amount"].ToInt32() * 7;
                                     if (LeaderboardSetting.Value["Start"].ToLocalTime().AddDays(Week) <= DateTime.Now)
                                     {
-                                        Tasks.Add(async () =>
-                                        {
-                                            await Client.GetDatabase("").GetCollection<BsonDocument>("").FindAsync("");
-                                        });
+                                        Tasks.Add(() =>
+                                       {
+                                           ResetLeaderboard(InfoUser["AccountSetting"]["Token"].ToString(), InfoUser["Games"][i].AsString, LeaderboardSetting.Name);
+                                       });
                                     }
                                 }
                                 break;
                             case 4:
                                 {
-                                if (LeaderboardSetting.Value["Start"].ToLocalTime().AddMonths(LeaderboardSetting.Value["Amount"].ToInt32()) <= DateTime.Now)
-                                {
-                                    Tasks.Add(async () =>
+                                    if (LeaderboardSetting.Value["Start"].ToLocalTime().AddMonths(LeaderboardSetting.Value["Amount"].ToInt32()) <= DateTime.Now)
                                     {
-                                        await Client.GetDatabase("").GetCollection<BsonDocument>("").FindAsync("");
-                                    });
-                                }
+                                        Tasks.Add(() =>
+                                        {
+                                            ResetLeaderboard(InfoUser["AccountSetting"]["Token"].ToString(), InfoUser["Games"][i].AsString, LeaderboardSetting.Name);
+                                        });
+                                    }
 
                                 }
                                 break;
                         }
 
                     }
+
                 }
 
             }
 
             return Tasks;
 
+        }
+
+        public async void ResetLeaderboard(string Token, string Studio, string NameLeaderboard)
+        {
+            //send data
+            var client = new RestClient("http://193.141.64.203/PageLeaderBoard/Reset");
+            client.Timeout = -1;
+            var request = new RestRequest(Method.POST);
+            request.AddParameter("Token", Token);
+            request.AddParameter("Studio", Studio);
+            request.AddParameter("NameLeaderboard", NameLeaderboard);
+            await client.ExecuteAsync(request);
         }
     }
 }

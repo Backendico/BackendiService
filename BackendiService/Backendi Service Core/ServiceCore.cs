@@ -23,7 +23,7 @@ namespace BackendiService.Backendi_Service_Core
             {
                 await Task.Delay(1);
 
-                var LeaderboardTask = await Leaderboard_TimeReset.ReciveTasks();
+                List<Action> LeaderboardTask = await Leaderboard_TimeReset.ReciveTasks();
 
                 foreach (var item in LeaderboardTask)
                 {
