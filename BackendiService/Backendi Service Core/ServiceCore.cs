@@ -21,7 +21,7 @@ namespace BackendiService.Backendi_Service_Core
         {
             while (true)
             {
-                await Task.Delay(1);
+                await Task.Delay(1000);
 
                 List<Action> LeaderboardTask = await Leaderboard_TimeReset.ReciveTasks();
 
