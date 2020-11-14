@@ -29,7 +29,7 @@ namespace BackendiService.Backendi_Service_Core.Leaderboard.TimeReset
                 {
 
                     BsonDocument SettingStudio = await Client.GetDatabase(Studio.AsString).GetCollection<BsonDocument>("Setting").FindAsync(new BsonDocument { { "_id", "Setting" } }).Result.SingleAsync();
-                    
+
                     //Find List Leaderboards
                     foreach (BsonElement LeaderboardSetting in SettingStudio["Leaderboards"]["List"].AsBsonDocument)
                     {
@@ -38,18 +38,18 @@ namespace BackendiService.Backendi_Service_Core.Leaderboard.TimeReset
                         {
                             case 1:
                                 {
-                                    if (LeaderboardSetting.Value["Start"].ToLocalTime().AddHours(LeaderboardSetting.Value["Amount"].ToInt32()) <= DateTime.Now)
+                                    if (DateTime.Parse(LeaderboardSetting.Value["Start"].ToString()).AddHours(LeaderboardSetting.Value["Amount"].ToInt32()) <= DateTime.Now)
                                     {
                                         Tasks.Add(async () =>
                                        {
-                                         await  ResetLeaderboard(InfoUser["AccountSetting"]["Token"].AsString, Studio.AsString, LeaderboardSetting.Name);
+                                           await ResetLeaderboard(InfoUser["AccountSetting"]["Token"].AsString, Studio.AsString, LeaderboardSetting.Name);
                                        });
                                     }
                                 }
                                 break;
                             case 2:
                                 {
-                                    if (LeaderboardSetting.Value["Start"].ToLocalTime().AddDays(LeaderboardSetting.Value["Amount"].ToInt32()) <= DateTime.Now)
+                                    if (DateTime.Parse(LeaderboardSetting.Value["Start"].ToString()).AddDays(LeaderboardSetting.Value["Amount"].ToInt32()) <= DateTime.Now)
                                     {
                                         Tasks.Add(async () =>
                                         {
@@ -61,7 +61,7 @@ namespace BackendiService.Backendi_Service_Core.Leaderboard.TimeReset
                             case 3:
                                 {
                                     var Week = LeaderboardSetting.Value["Amount"].ToInt32() * 7;
-                                    if (LeaderboardSetting.Value["Start"].ToLocalTime().AddDays(Week) <= DateTime.Now)
+                                    if (DateTime.Parse(LeaderboardSetting.Value["Start"].ToString()).AddDays(Week) <= DateTime.Now)
                                     {
                                         Tasks.Add(async () =>
                                         {
@@ -72,7 +72,7 @@ namespace BackendiService.Backendi_Service_Core.Leaderboard.TimeReset
                                 break;
                             case 4:
                                 {
-                                    if (LeaderboardSetting.Value["Start"].ToLocalTime().AddMonths(LeaderboardSetting.Value["Amount"].ToInt32()) <= DateTime.Now)
+                                    if (DateTime.Parse(LeaderboardSetting.Value["Start"].ToString()).AddMonths(LeaderboardSetting.Value["Amount"].ToInt32()) <= DateTime.Now)
                                     {
                                         Tasks.Add(async () =>
                                         {
