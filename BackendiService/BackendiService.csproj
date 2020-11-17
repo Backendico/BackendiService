@@ -159,7 +159,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Backendi Service Core\Leaderboard\TimeReset\Leaderboard_TimeReset.cs" />
+    <Compile Include="Backendi Service Core\Leaderboard\ControllLeaderboard.cs" />
     <Compile Include="Backendi Service Core\ServiceCore.cs" />
     <Compile Include="ProjectInstaller.cs">
       <SubType>Component</SubType>
@@ -208,6 +208,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\MongoDB.LibMongocrypt.1.1.0-beta02\build\MongoDB.Libmongocrypt.targets" Condition="Exists('..\packages\MongoDB.LibMongocrypt.1.1.0-beta02\build\MongoDB.Libmongocrypt.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

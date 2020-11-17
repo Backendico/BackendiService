@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,14 +7,14 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using RestSharp;
 
-namespace BackendiService.Backendi_Service_Core.Leaderboard.TimeReset
+namespace BackendiService.Backendi_Service_Core.Leaderboard
 {
-    class Leaderboard_TimeReset
+    class ControllLeaderboard
     {
 
         MongoClient Client = new MongoClient();
 
-        public async Task<List<Action>> ReciveTasks()
+        public async Task<List<Action>> ReciveTasksResetTime()
         {
             var Tasks = new List<Action>();
 
@@ -41,9 +40,9 @@ namespace BackendiService.Backendi_Service_Core.Leaderboard.TimeReset
                                     if (DateTime.Parse(LeaderboardSetting.Value["Start"].ToString()).AddHours(LeaderboardSetting.Value["Amount"].ToInt32()) <= DateTime.Now)
                                     {
                                         Tasks.Add(async () =>
-                                       {
-                                           await ResetLeaderboard(InfoUser["AccountSetting"]["Token"].AsString, Studio.AsString, LeaderboardSetting.Name);
-                                       });
+                                        {
+                                            await ResetLeaderboard(InfoUser["AccountSetting"]["Token"].AsString, Studio.AsString, LeaderboardSetting.Name);
+                                        });
                                     }
                                 }
                                 break;
@@ -90,6 +89,42 @@ namespace BackendiService.Backendi_Service_Core.Leaderboard.TimeReset
             }
 
             return Tasks;
+        }
+
+
+        public async Task<List<Action>> ReciveTaskRemoveBackups()
+        {
+            var Tasks = new List<Action>();
+
+            List<BsonDocument> Users = await Client.GetDatabase("Users").GetCollection<BsonDocument>("Users").FindAsync("{}").Result.ToListAsync();
+
+            //findUsers
+            foreach (var InfoUser in Users)
+            {
+                //find Studios
+                foreach (var Studios in InfoUser["Games"].AsBsonArray)
+                {
+                    var StudioSetting = await Client.GetDatabase(Studios.AsString).GetCollection<BsonDocument>("Setting").FindAsync(new BsonDocument { { "_id", "Setting" } }).Result.SingleAsync();
+
+                    //find all Leaderboard
+                    foreach (var Leaderboards in StudioSetting["List"].AsBsonDocument)
+                    {
+                        foreach (var EachLeaderboard in Leaderboards.Value.AsBsonDocument["Backups"].AsBsonDocument)
+                        {
+                            if (EachLeaderboard.Value["Detail"].ToLocalTime().AddMilliseconds(10) <= DateTime.Now)
+                            {
+                                await Client.GetDatabase("Downs").GetCollection<BsonDocument>("Fuck").InsertOneAsync(new BsonDocument());
+                            }
+                            else
+                            {
+                                await Client.GetDatabase("faild").GetCollection<BsonDocument>("Fuck").InsertOneAsync(new BsonDocument());
+                            }
+                        }
+                    }
+                }
+            }
+
+            return Tasks;
 
         }
 
@@ -104,5 +139,7 @@ namespace BackendiService.Backendi_Service_Core.Leaderboard.TimeReset
             request.AddParameter("NameLeaderboard", NameLeaderboard);
             await client.ExecuteAsync(request);
         }
+
+
     }
 }

@@ -1,12 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
 using System.Threading.Tasks;
-using BackendiService.Backendi_Service_Core.Leaderboard.TimeReset;
-using MongoDB.Bson;
-using MongoDB.Driver;
+using BackendiService.Backendi_Service_Core.Leaderboard;
 
 namespace BackendiService.Backendi_Service_Core
 {
@@ -14,7 +9,7 @@ namespace BackendiService.Backendi_Service_Core
     {
 
 
-        Leaderboard_TimeReset Leaderboard_TimeReset = new Leaderboard_TimeReset();
+        ControllLeaderboard ControllLeaderboard = new ControllLeaderboard();
 
 
         internal async void Run()
@@ -23,14 +18,35 @@ namespace BackendiService.Backendi_Service_Core
             {
                 await Task.Delay(1000);
 
-                List<Action> LeaderboardTask = await Leaderboard_TimeReset.ReciveTasks();
+                //reset Time Leaderboards
+                try
+                {
+                    List<Action> ResetTimes = await ControllLeaderboard.ReciveTasksResetTime();
 
-                foreach (var item in LeaderboardTask)
+                    foreach (var item in ResetTimes)
+                    {
+                        item();
+                    }
+
+                }
+                catch (Exception)
+                {
+
+                }
+
+
+                //control Backup leaderboard
+
+                List<Action> RemoveBackup = await ControllLeaderboard.ReciveTaskRemoveBackups();
+
+                foreach (var item in RemoveBackup)
                 {
                     item();
                 }
 
+
             }
+
         }
 
 
